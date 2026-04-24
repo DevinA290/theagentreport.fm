@@ -359,11 +359,41 @@
       <p class="quote-attr">— The Voice · Pilot Episode</p>
     </div>
 
-    <form class="signup-form" action="https://formspree.io/f/placeholder" method="POST">
-      <input type="email" name="email" placeholder="your@email.com" required />
-      <button type="submit" class="btn">Notify me</button>
+    <form class="signup-form" id="notify-form">
+      <input type="email" name="email" id="email-input" placeholder="your@email.com" required />
+      <button type="submit" class="btn" id="submit-btn">Notify me</button>
     </form>
-    <p class="form-note">No spam. Just the launch notification + founding member window.</p>
+    <p class="form-note" id="form-note">No spam. Just the launch notification + founding member window.</p>
+
+    <script>
+      document.getElementById('notify-form').addEventListener('submit', async function(e) {
+        e.preventDefault();
+        const email = document.getElementById('email-input').value;
+        const btn = document.getElementById('submit-btn');
+        const note = document.getElementById('form-note');
+        btn.textContent = 'Sending...';
+        btn.disabled = true;
+        try {
+          const res = await fetch('https://agent-report-signup.terrella8.workers.dev', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+            body: JSON.stringify({ email, _subject: 'Agent Report — New Signup', message: 'New signup from theagentreport.fm' })
+          });
+          if (res.ok) {
+            note.textContent = "✅ You're on the list. We'll be in touch.";
+            note.style.color = '#e8c56a';
+            document.getElementById('email-input').style.display = 'none';
+            btn.style.display = 'none';
+          } else {
+            throw new Error('Form error');
+          }
+        } catch {
+          note.textContent = 'Something went wrong — email us at hello@cadenceailabs.com';
+          btn.textContent = 'Notify me';
+          btn.disabled = false;
+        }
+      });
+    </script>
   </section>
 
   <hr class="divider" />
